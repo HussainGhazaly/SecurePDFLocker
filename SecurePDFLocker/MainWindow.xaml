@@ -13,8 +13,19 @@
         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,5,0,0">
             <Label Content="Enter Key:"/>
             <Label Content="Select File to Encrypt:" Margin="0,10,0,0"/>
-            <Label Content="Select File to Decrypt:" Margin="0,10,0,0"/>
+            <Label Content="Select File to Decrypt:" Margin="0,50,0,0"/>
         </StackPanel>
+
+        <!-- Buttons for encryption and decryption -->
+        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Height="217" Margin="22,164,0,0">
+            <Button Content="Encrypt" Click="Encrypt_Click" Margin="0,50,0,50" Height="25" Width="50"/>
+            <Button Content="Decrypt" Click="Decrypt_Click" Margin="0,0,0,70" Height="33" Width="48"/>
+        </StackPanel>
+        
+        <!-- Textboxes for input -->
+        <TextBox x:Name="KeyTextBox" Width="150" Margin="149,151,51,0" VerticalAlignment="Top" GotFocus="KeyTextBox_GotFocus"/>
+        <TextBox x:Name="EncryptFileTextBox" Width="150" Margin="139,199,61,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="DecryptFileTextBox" Width="150" Margin="139,269,61,0" VerticalAlignment="Top"/>
 
     </Grid>
 </Window>

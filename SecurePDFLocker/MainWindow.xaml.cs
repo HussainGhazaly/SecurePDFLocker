@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,7 +26,23 @@ namespace SecurePDFLocker
             InitializeComponent();
         }
 
-        private void OpenFile_Click(object sender, RoutedEventArgs e)
+        // Event handler for when the "Enter Key" TextBox gains focus
+        private void KeyTextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            if (openFileDialog.ShowDialog() == true)
+            {
+                // Set the selected file path to the "Enter Key" TextBox
+                KeyTextBox.Text = openFileDialog.FileName;
+            }
+        }
+
+        private void Encrypt_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Decrypt_Click(object sender, RoutedEventArgs e)
         {
 
         }
