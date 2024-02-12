@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33801.468
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SecurePDFLocker", "SecurePDFLocker\SecurePDFLocker.csproj", "{CEF676E6-13D2-49B0-BDC0-1F4D5C252930}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CEF676E6-13D2-49B0-BDC0-1F4D5C252930}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEF676E6-13D2-49B0-BDC0-1F4D5C252930}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEF676E6-13D2-49B0-BDC0-1F4D5C252930}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEF676E6-13D2-49B0-BDC0-1F4D5C252930}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3C15CFF2-1089-4DB0-A5A0-83073C5C7310}
+	EndGlobalSection
+EndGlobal
