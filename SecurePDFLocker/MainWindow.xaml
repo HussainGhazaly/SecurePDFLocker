@@ -23,9 +23,9 @@
         </StackPanel>
         
         <!-- Textboxes for input -->
-        <TextBox x:Name="KeyTextBox" Width="150" Margin="149,151,51,0" VerticalAlignment="Top" GotFocus="KeyTextBox_GotFocus"/>
-        <TextBox x:Name="EncryptFileTextBox" Width="150" Margin="139,199,61,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="DecryptFileTextBox" Width="150" Margin="139,269,61,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="KeyTextBox" Width="150" Margin="149,151,51,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="EncryptFileTextBox" Width="150" Margin="139,199,61,0" VerticalAlignment="Top" GotFocus="KeyTextBox_GotFocus" TextChanged="KeyTextBox_TextChanged"/>
+        <TextBox x:Name="DecryptFileTextBox" Width="150" Margin="139,269,61,0" VerticalAlignment="Top" GotFocus="KeyTextBox_GotFocus" TextChanged="KeyTextBox_TextChanged"/>
 
     </Grid>
 </Window>

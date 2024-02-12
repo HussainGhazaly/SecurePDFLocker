@@ -46,5 +46,12 @@ namespace SecurePDFLocker
         {
 
         }
+
+        private void KeyTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+
     }
 }
