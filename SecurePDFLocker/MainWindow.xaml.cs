@@ -1,20 +1,10 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Security.Cryptography;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Security.Cryptography;
-using System.IO;
 
 namespace SecurePDFLocker
 {
@@ -27,21 +17,25 @@ namespace SecurePDFLocker
         {
             InitializeComponent();
         }
-
+        
         // Event handler for when the "Enter Key" TextBox gains focus
         private void KeyTextBox_GotFocus(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             if (openFileDialog.ShowDialog() == true)
             {
-                // Set the selected file path to the "Enter Key" TextBox
-                EncryptFileTextBox.Text = openFileDialog.FileName;
+                // Check which TextBox has gained focus
+                if (sender == EncryptFileTextBox)
+                {
+                    // Set the selected file path to the "Encrypt" TextBox
+                    EncryptFileTextBox.Text = openFileDialog.FileName;
+                }
+                else if (sender == DecryptFileTextBox)
+                {
+                    // Set the selected file path to the "Decrypt" TextBox
+                    DecryptFileTextBox.Text = openFileDialog.FileName;
+                }
             }
-            else if (openFileDialog.ShowDialog() == true)
-            {
-                DecryptFileTextBox.Text = openFileDialog.FileName;
-            }
-
         }
 
         private void KeyTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -51,7 +45,7 @@ namespace SecurePDFLocker
 
         public byte[] DeriveKeyFromPassword(string password, byte[] salt, int keySize = 32, int iterations = 10000)
         {
-            using (var deriveBytes = new Rfc2898DeriveBytes(password, salt, iterations))// create a key from the password
+            using (var deriveBytes = new Rfc2898DeriveBytes(password, salt, iterations))//This method generates a cryptographic key from a password and salt using the PBKDF2 algorithm (implemented by Rfc2898DeriveBytes). It returns the derived key as a byte array.
             {
                 return deriveBytes.GetBytes(keySize);
             }
@@ -112,15 +106,24 @@ namespace SecurePDFLocker
             string password = KeyTextBox.Text; // Assuming KeyTextBox contains the password
             byte[] salt = GenerateSalt(); // Generate salt
             byte[] key = DeriveKeyFromPassword(password, salt); // Derive key from password and salt
+            byte[] iv = GenerateSalt(16); // Generate initialization vector (IV)
 
-            byte[] dataToEncrypt = Encoding.UTF8.GetBytes("C:\\Users\\HUM014\\Downloads\\DUC Work\\TEST.pdf"); // Replace this with your actual data
+            byte[] dataToEncrypt = File.ReadAllBytes(EncryptFileTextBox.Text); // Read data from file
 
             // Encrypt data
-            byte[] encryptedData = Encrypt(dataToEncrypt, key, key); // Using the key as IV for simplicity
+            byte[] encryptedData = Encrypt(dataToEncrypt, key, iv);
 
-            // Save or use the encrypted data as needed
+
+            // Save encrypted data to a file
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "Encrypted Files (*.enc)|*.enc|All files (*.*)|*.*";
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                File.WriteAllBytes(saveFileDialog.FileName, encryptedData);
+                // Display a message box indicating the selected file path
+                MessageBox.Show("File encrypted and saved to: " + saveFileDialog.FileName, "Encryption Completed", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
-
 
         // Event handler for Decrypt button click
         private void DecryptButton_Click(object sender, RoutedEventArgs e)
@@ -129,13 +132,28 @@ namespace SecurePDFLocker
             byte[] salt = GenerateSalt(); // Generate salt
             byte[] key = DeriveKeyFromPassword(password, salt); // Derive key from password and salt
 
-            byte[] encryptedData = File.ReadAllBytes("path_to_encrypted_file"); // Read encrypted data from file
+            byte[] encryptedData = File.ReadAllBytes(DecryptFileTextBox.Text); // Read encrypted data from file
 
-            // Decrypt data
-            byte[] decryptedData = Decrypt(encryptedData, key, key); // Using the key as IV for simplicity
+            // Extract IV from the first 16 bytes of the encrypted data
+            byte[] iv = new byte[16];
+            Array.Copy(encryptedData, 0, iv, 0, 16);
 
-            // Process or display the decrypted data as needed
+            // Decrypt data (excluding IV)
+            byte[] decryptedData = Decrypt(encryptedData.Skip(16).ToArray(), key, iv);
+
+            // Prompt user to select a destination file path to save the decrypted data
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "Decrypted Files (*.txt)|*.txt|All files (*.*)|*.*";
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                // Save decrypted data to the selected file
+                File.WriteAllBytes(saveFileDialog.FileName, decryptedData);
+
+                // Display a message box indicating the selected file path
+                MessageBox.Show("File decrypted and saved to: " + saveFileDialog.FileName, "Decryption Completed", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
+
 
         private void KeyTextBox_TextChanged_1(object sender, TextChangedEventArgs e)
         {
