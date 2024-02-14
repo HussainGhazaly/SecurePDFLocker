@@ -38,7 +38,7 @@ namespace SecurePDFLocker
             }
         }
 
-        private void KeyTextBox_TextChanged(object sender, TextChangedEventArgs e) //This method is an event handler for the TextChanged event of the KeyTextBox
+        private void KeyTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
 
         }
@@ -64,10 +64,11 @@ namespace SecurePDFLocker
 
         public byte[] Encrypt(byte[] data, byte[] key, byte[] iv)
         {
-            using (var aesAlg = Aes.Create()) //this method encrypts a byte array (data) using the AES encryption algorithm
+            using (var aesAlg = Aes.Create()) //Object from
             {
                 aesAlg.Key = key;
                 aesAlg.IV = iv;
+                aesAlg.Padding = PaddingMode.Zeros;
 
                 using (var encryptor = aesAlg.CreateEncryptor())
                 using (var msEncrypt = new MemoryStream())
@@ -82,12 +83,13 @@ namespace SecurePDFLocker
         }
 
 
-        public byte[] Decrypt(byte[] encryptedData, byte[] key, byte[] iv) // This method decrypts an encrypted byte array using the AES decryption algorithm
+        public byte[] Decrypt(byte[] encryptedData, byte[] key, byte[] iv)
         {
             using (var aesAlg = Aes.Create())
             {
                 aesAlg.Key = key;
                 aesAlg.IV = iv;
+                aesAlg.Padding = PaddingMode.Zeros;
 
                 using (var decryptor = aesAlg.CreateDecryptor())
                 using (var msDecrypt = new MemoryStream(encryptedData))
@@ -100,10 +102,6 @@ namespace SecurePDFLocker
             }
         }
 
-        //
-        // This method handles the Click event of the EncryptButton control.
-        // It performs file encryption using AES algorithm with a password.
-        // The encrypted file is saved with a .enc extension.
         private void EncryptButton_Click(object sender, RoutedEventArgs e)
         {
             string password = KeyTextBox.Text; // Assuming KeyTextBox contains the password
@@ -130,10 +128,6 @@ namespace SecurePDFLocker
             }
         }
 
-        // 
-        // This method handles the Click event of the DecryptButton control.
-        // It performs file decryption using AES algorithm with a password.
-        // The decrypted file is saved with a .txt extension.
         private void DecryptButton_Click(object sender, RoutedEventArgs e)
         {
             string password = KeyTextBox.Text; // Assuming KeyTextBox contains the password
