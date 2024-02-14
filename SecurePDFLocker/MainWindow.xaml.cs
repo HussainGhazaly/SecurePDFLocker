@@ -38,7 +38,7 @@ namespace SecurePDFLocker
             }
         }
 
-        private void KeyTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void KeyTextBox_TextChanged(object sender, TextChangedEventArgs e) //This method is an event handler for the TextChanged event of the KeyTextBox
         {
 
         }
@@ -64,7 +64,7 @@ namespace SecurePDFLocker
 
         public byte[] Encrypt(byte[] data, byte[] key, byte[] iv)
         {
-            using (var aesAlg = Aes.Create()) //Object from
+            using (var aesAlg = Aes.Create()) //this method encrypts a byte array (data) using the AES encryption algorithm
             {
                 aesAlg.Key = key;
                 aesAlg.IV = iv;
@@ -82,7 +82,7 @@ namespace SecurePDFLocker
         }
 
 
-        public byte[] Decrypt(byte[] encryptedData, byte[] key, byte[] iv)
+        public byte[] Decrypt(byte[] encryptedData, byte[] key, byte[] iv) // This method decrypts an encrypted byte array using the AES decryption algorithm
         {
             using (var aesAlg = Aes.Create())
             {
@@ -100,7 +100,10 @@ namespace SecurePDFLocker
             }
         }
 
-        // Event handler for Encrypt button click
+        //
+        // This method handles the Click event of the EncryptButton control.
+        // It performs file encryption using AES algorithm with a password.
+        // The encrypted file is saved with a .enc extension.
         private void EncryptButton_Click(object sender, RoutedEventArgs e)
         {
             string password = KeyTextBox.Text; // Assuming KeyTextBox contains the password
@@ -113,33 +116,41 @@ namespace SecurePDFLocker
             // Encrypt data
             byte[] encryptedData = Encrypt(dataToEncrypt, key, iv);
 
+            // Concatenate salt with encrypted data
+            byte[] saltedEncryptedData = salt.Concat(encryptedData).ToArray();
 
-            // Save encrypted data to a file
+            // Save encrypted data (with salt) to a file
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "Encrypted Files (*.enc)|*.enc|All files (*.*)|*.*";
             if (saveFileDialog.ShowDialog() == true)
             {
-                File.WriteAllBytes(saveFileDialog.FileName, encryptedData);
+                File.WriteAllBytes(saveFileDialog.FileName, saltedEncryptedData);
                 // Display a message box indicating the selected file path
                 MessageBox.Show("File encrypted and saved to: " + saveFileDialog.FileName, "Encryption Completed", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 
-        // Event handler for Decrypt button click
+        // 
+        // This method handles the Click event of the DecryptButton control.
+        // It performs file decryption using AES algorithm with a password.
+        // The decrypted file is saved with a .txt extension.
         private void DecryptButton_Click(object sender, RoutedEventArgs e)
         {
             string password = KeyTextBox.Text; // Assuming KeyTextBox contains the password
-            byte[] salt = GenerateSalt(); // Generate salt
-            byte[] key = DeriveKeyFromPassword(password, salt); // Derive key from password and salt
 
-            byte[] encryptedData = File.ReadAllBytes(DecryptFileTextBox.Text); // Read encrypted data from file
+            byte[] encryptedDataWithSalt = File.ReadAllBytes(DecryptFileTextBox.Text); // Read encrypted data from file
 
-            // Extract IV from the first 16 bytes of the encrypted data
-            byte[] iv = new byte[16];
-            Array.Copy(encryptedData, 0, iv, 0, 16);
+            // Extract salt from the first 16 bytes of the encrypted data
+            byte[] salt = encryptedDataWithSalt.Take(16).ToArray();
 
-            // Decrypt data (excluding IV)
-            byte[] decryptedData = Decrypt(encryptedData.Skip(16).ToArray(), key, iv);
+            // Derive key using the extracted salt
+            byte[] key = DeriveKeyFromPassword(password, salt);
+
+            // Extract encrypted data (excluding salt)
+            byte[] encryptedData = encryptedDataWithSalt.Skip(16).ToArray();
+
+            // Decrypt data
+            byte[] decryptedData = Decrypt(encryptedData, key, salt);
 
             // Prompt user to select a destination file path to save the decrypted data
             SaveFileDialog saveFileDialog = new SaveFileDialog();
