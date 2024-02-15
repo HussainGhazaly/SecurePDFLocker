@@ -6,7 +6,6 @@
         xmlns:local="clr-namespace:SecurePDFLocker"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="350">
-    
     <Grid>
         <!-- Header Label -->
         <Label Content="SecurePDFLocker" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,20,0,376"/>

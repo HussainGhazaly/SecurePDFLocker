@@ -17,7 +17,7 @@ namespace SecurePDFLocker
         {
             InitializeComponent();
         }
-        
+
         // Event handler for when the "Enter Key" TextBox gains focus
         private void KeyTextBox_GotFocus(object sender, RoutedEventArgs e)
         {
@@ -43,15 +43,19 @@ namespace SecurePDFLocker
 
         }
 
-        public byte[] DeriveKeyFromPassword(string password, byte[] salt, int keySize = 32, int iterations = 10000)
+        public byte[] DeriveKeyFromPassword(string password, byte[] salt, int keySize = 16, int iterations = 10000)
         {
-            using (var deriveBytes = new Rfc2898DeriveBytes(password, salt, iterations))//This method generates a cryptographic key from a password and salt using the PBKDF2 algorithm (implemented by Rfc2898DeriveBytes). It returns the derived key as a byte array.
+            using (var deriveBytes = new Rfc2898DeriveBytes(password, salt, iterations))//This method generates a cryptographic key from a
+                                                                                        //password and salt using the PBKDF2 algorithm
+                                                                                        //(implemented by Rfc2898DeriveBytes).
+                                                                                        //It returns the derived key as a byte array.
             {
                 return deriveBytes.GetBytes(keySize);
             }
         }
 
-        public byte[] GenerateSalt(int size = 16) // code generates a random salt of a specified length using a cryptographic random number generator and returns it as an array of bytes. 
+        public byte[] GenerateSalt(int size = 16) // code generates a random salt of a specified length using a cryptographic random number generator
+                                                  // and returns it as an array of bytes. 
         {
             using (var rng = new RNGCryptoServiceProvider())
             {
@@ -64,14 +68,15 @@ namespace SecurePDFLocker
 
         public byte[] Encrypt(byte[] data, byte[] key, byte[] iv)
         {
-            using (var aesAlg = Aes.Create()) //Object from
+            using (var aesAlg = Aes.Create())
             {
+                aesAlg.KeySize = key.Length * 8;
                 aesAlg.Key = key;
                 aesAlg.IV = iv;
                 aesAlg.Padding = PaddingMode.Zeros;
 
                 using (var encryptor = aesAlg.CreateEncryptor())
-                using (var msEncrypt = new MemoryStream())
+                using (var msEncrypt = new MemoryStream()) //consume memory of file in a easy way = study
                 {
                     using (var csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
                     {
@@ -87,6 +92,7 @@ namespace SecurePDFLocker
         {
             using (var aesAlg = Aes.Create())
             {
+                aesAlg.KeySize = key.Length * 8;
                 aesAlg.Key = key;
                 aesAlg.IV = iv;
                 aesAlg.Padding = PaddingMode.Zeros;
@@ -148,7 +154,7 @@ namespace SecurePDFLocker
 
             // Prompt user to select a destination file path to save the decrypted data
             SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "Decrypted Files (*.txt)|*.txt|All files (*.*)|*.*";
+            //saveFileDialog.Filter = "Decrypted Files (*.txt)|*.txt|All files (*.*)|*.*";
             if (saveFileDialog.ShowDialog() == true)
             {
                 // Save decrypted data to the selected file
