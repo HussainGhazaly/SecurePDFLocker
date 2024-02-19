@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿
+using Microsoft.Win32;
 using System;
 using System.IO;
 using System.Linq;
@@ -103,10 +104,21 @@ namespace SecurePDFLocker
                 using (var decryptedData = new MemoryStream())
                 {
                     csDecrypt.CopyTo(decryptedData);
-                    return decryptedData.ToArray();
+
+                    // Find the index of the last non-zero byte
+                    int lastIndex = Array.FindLastIndex(decryptedData.ToArray(), b => b != 0);
+
+                    // Create a new byte array containing only the non-zero bytes
+                    byte[] trimmedData = new byte[lastIndex + 1];
+                    Array.Copy(decryptedData.ToArray(), trimmedData, lastIndex + 1);
+
+                    return trimmedData;
                 }
             }
         }
+
+
+
 
         private void EncryptButton_Click(object sender, RoutedEventArgs e)
         {
@@ -117,8 +129,12 @@ namespace SecurePDFLocker
 
             byte[] dataToEncrypt = File.ReadAllBytes(EncryptFileTextBox.Text); // Read data from file
 
+            // Prepend custom header to the data
+            byte[] header = System.Text.Encoding.UTF8.GetBytes($"FileType:{Path.GetExtension(EncryptFileTextBox.Text)}\r\nFileLength:{dataToEncrypt.Length}\r\n");
+            byte[] dataWithHeader = header.Concat(dataToEncrypt).ToArray();
+
             // Encrypt data
-            byte[] encryptedData = Encrypt(dataToEncrypt, key, iv);
+            byte[] encryptedData = Encrypt(dataWithHeader, key, iv);
 
             // Concatenate salt with encrypted data
             byte[] saltedEncryptedData = salt.Concat(encryptedData).ToArray();
@@ -176,7 +192,4 @@ namespace SecurePDFLocker
     }
 
 }
-
-
-
 
